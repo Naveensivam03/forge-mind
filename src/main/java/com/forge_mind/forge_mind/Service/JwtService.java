@@ -1,7 +1,5 @@
 package com.forge_mind.forge_mind.Service;
 
-import com.forge_mind.forge_mind.Repository.UserRepository;
-import com.forge_mind.forge_mind.User.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -15,7 +13,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class JwtService {

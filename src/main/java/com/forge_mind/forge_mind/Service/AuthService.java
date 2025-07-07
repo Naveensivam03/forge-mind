@@ -1,16 +1,14 @@
 package com.forge_mind.forge_mind.Service;
 
 import com.forge_mind.forge_mind.Repository.UserRepository;
-import com.forge_mind.forge_mind.User.User;
+import com.forge_mind.forge_mind.database.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.mail.MessagingException;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import java.util.Optional;
 import java.util.Random;
