@@ -1,5 +1,6 @@
 package com.forge_mind.forge_mind.database;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,10 @@ public class Posts {
     private Long id;
     @Column(nullable = false)
     private String content;
-    @Column(nullable = false )
-    private Integer category_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
+    private Category category;
 
     private Integer upvotes;
 
@@ -22,10 +25,10 @@ public class Posts {
 
     private LocalDateTime created_at;
 
-    public Posts(Long id, String content, Integer category_id, Integer upvotes, Integer downvotes, LocalDateTime created_at) {
+    public Posts(Long id, String content, Category category, Integer upvotes, Integer downvotes, LocalDateTime created_at) {
         this.id = id;
         this.content = content;
-        this.category_id = category_id;
+        this.category = category;
         this.upvotes = upvotes;
         this.downvotes = downvotes;
         this.created_at = created_at;
@@ -34,9 +37,9 @@ public class Posts {
     public Posts() {
     }
 
-    public Posts(String content, Integer category_id, Integer upvotes, Integer downvotes, LocalDateTime created_at) {
+    public Posts(String content, Category category, Integer upvotes, Integer downvotes, LocalDateTime created_at) {
         this.content = content;
-        this.category_id = category_id;
+        this.category = category;
         this.upvotes = upvotes;
         this.downvotes = downvotes;
         this.created_at = created_at;
@@ -58,12 +61,12 @@ public class Posts {
         this.content = content;
     }
 
-    public Integer getCategory_id() {
-        return category_id;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategory_id(Integer category_id) {
-        this.category_id = category_id;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public Integer getUpvotes() {

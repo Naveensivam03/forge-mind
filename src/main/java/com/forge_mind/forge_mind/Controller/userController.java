@@ -4,6 +4,7 @@ import com.forge_mind.forge_mind.Dto.LoginDto;
 import com.forge_mind.forge_mind.Dto.Signup;
 import com.forge_mind.forge_mind.Dto.VerifyDto;
 import com.forge_mind.forge_mind.Service.AuthService;
+import com.forge_mind.forge_mind.Service.PostService;
 import com.forge_mind.forge_mind.Service.UserService;
 import com.forge_mind.forge_mind.Service.JwtService;
 import jakarta.mail.MessagingException;
@@ -19,11 +20,13 @@ public class userController {
     private UserService userService;
     private AuthService authService;
     private JwtService jwtService;
+    private PostService postService;
 
-    public userController(UserService userService , AuthService authService, JwtService jwtService) {
+    public userController(UserService userService , AuthService authService, JwtService jwtService , PostService postService) {
         this.userService = userService;
         this.authService = authService;
         this.jwtService = jwtService;
+        this.postService = postService;
     }
 
     @GetMapping(path = "/allusers")
@@ -61,5 +64,13 @@ public class userController {
         ResponseEntity<?> result = authService.verifyjwt(authheader);
         return result;
     }
+    @GetMapping(path = "/signup/all")
+    public List allposts() {
+        return postService.allPosts();
+    }
 
+    @GetMapping(path = "/signup/allposts/{name}")
+    public List catePosts(@PathVariable String name){
+        return postService.categPosts(name);
+    }
 }

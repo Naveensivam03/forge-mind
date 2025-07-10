@@ -1,0 +1,28 @@
+### Feature: Voting with Upvotes and Downvotes
+
+1. **Database Structure**:
+    - Utilize the existing fields `upvotes` and `downvotes` in the `Posts` entity.
+
+2. **User Actions**:
+    - A user can either upvote or downvote a post.
+    - A user can change their vote from upvote to downvote or remove the vote entirely.
+
+3. **Backend Implementation**:
+    - **Track User Votes**: Introduce a new entity to track votes by users, e.g., `UserVote`.
+        - Fields: `postId`, `userId`, `voteType` (UP, DOWN, or NONE).
+    - **Service Logic**:
+        - When a user votes, check existing vote in `UserVote`.
+        - Update or delete the previous vote as necessary.
+        - Update `upvotes` or `downvotes` count in `Posts` based on user action.
+    - **Endpoints**:
+        - Create endpoints for `POST`, `PATCH`, and `DELETE` to handle voting actions.
+
+4. **Frontend Considerations**:
+    - Display current votes count next to each post.
+    - Highlight the user's current vote (upvote or downvote) for each post.
+    - Update the UI in response to user actions without full page reloads.
+
+5. **Potential Enhancements**:
+    - Implement real-time updates using WebSockets or similar technologies.
+    - Introduce detailed voting history statistics for posts.
+    - Consider penalties or restrictions for manipulative voting behaviors.
