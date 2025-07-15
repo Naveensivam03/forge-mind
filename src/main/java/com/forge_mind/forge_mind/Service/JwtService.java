@@ -29,9 +29,7 @@ public class JwtService {
 
 
     //expiration time
-    public long expirationtime(){
-        return expirationTime;
-    }
+    public long expirationtime(){ return expirationTime; }
 
     //to convert the inputs into jwt tokens
     public String generateTokens(UserDetails userDetails ){

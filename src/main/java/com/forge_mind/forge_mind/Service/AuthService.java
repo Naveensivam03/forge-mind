@@ -106,7 +106,8 @@ public class AuthService {
                 // Generate JWT token for the verified user
                 String jwtToken = jwtService.generateTokens(user);
                 
-                return "User " + user.getUsername() + " verified successfully! JWT Token: " + jwtToken;
+                System.out.println( "User " + user.getUsername() + " verified successfully! JWT Token: " + jwtToken);
+                return jwtToken;
             } else {
                 return "Invalid verification code!";
             }

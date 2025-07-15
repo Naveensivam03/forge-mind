@@ -15,15 +15,21 @@ import org.springframework.stereotype.Service;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(c->c.disable())
+
+                .csrf(c -> c.disable())
                 .formLogin(f -> f.disable())
                 .httpBasic(h -> h.disable())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //this is to say that it won't create sessions and use those.
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // this is to
+                                                                                                        // say that it
+                                                                                                        // won't create
+                                                                                                        // sessions and
+                                                                                                        // use those.
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/signup/**", "/login").permitAll()
-                                .anyRequest().authenticated());
+                        .requestMatchers("/signup/**", "/login").permitAll()
+                        .anyRequest().authenticated());
+
         return http.build();
     }
 
