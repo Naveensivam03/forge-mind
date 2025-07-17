@@ -21,6 +21,7 @@ public class PostService {
     public List<PostResponseDto> allPosts() {
         System.out.println("this all posts from service is properly been calling out!");
         List<Posts> posts = postRepository.findAll();
+        System.out.println(posts);
         return posts.stream()
                 .map(post -> new PostResponseDto(
                         post,

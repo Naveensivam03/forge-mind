@@ -4,6 +4,7 @@ import com.forge_mind.forge_mind.Dto.LoginDto;
 import com.forge_mind.forge_mind.Dto.PostResponseDto;
 import com.forge_mind.forge_mind.Dto.Signup;
 import com.forge_mind.forge_mind.Dto.VerifyDto;
+import com.forge_mind.forge_mind.Repository.CategRepository;
 import com.forge_mind.forge_mind.Service.AuthService;
 import com.forge_mind.forge_mind.Service.PostService;
 import com.forge_mind.forge_mind.Service.UserService;
@@ -12,7 +13,7 @@ import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+import com.forge_mind.forge_mind.database.Category;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 
@@ -23,13 +24,15 @@ public class userController {
     private AuthService authService;
     private JwtService jwtService;
     private PostService postService;
+    private CategRepository categRepository;
 
     public userController(UserService userService, AuthService authService, JwtService jwtService,
-            PostService postService) {
+            PostService postService, CategRepository categRepository) {
         this.userService = userService;
         this.authService = authService;
         this.jwtService = jwtService;
         this.postService = postService;
+        this.categRepository = categRepository;
     }
 
     @GetMapping(path = "/allusers")
@@ -81,5 +84,11 @@ public class userController {
     @GetMapping(path = "/signup/allposts/{name}")
     public List catePosts(@PathVariable String name) {
         return postService.categPosts(name);
+    }
+
+    @GetMapping(path = "/signup/allcateg")
+    public List<Category> allcategory() {
+        System.out.println("hello");
+        return (categRepository.findAll());
     }
 }
