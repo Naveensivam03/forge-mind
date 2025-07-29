@@ -24,7 +24,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
     @Column(name = "isEnabled")
-    private boolean isAccount_enabled;
+    public boolean isAccount_enabled;
     private boolean IsExpired;
 //    @Column()
 //    private LocalDateTime verificationCodeExpiresAt;
@@ -87,6 +87,7 @@ public class User implements UserDetails {
             }
 
 
-
-
+    public boolean isAccount_enabled() {
+        return false;
+    }
 }

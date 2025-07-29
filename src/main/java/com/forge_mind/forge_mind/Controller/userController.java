@@ -11,6 +11,8 @@ import com.forge_mind.forge_mind.Service.PostService;
 import com.forge_mind.forge_mind.Service.UserService;
 import com.forge_mind.forge_mind.Service.JwtService;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +21,7 @@ import com.forge_mind.forge_mind.database.Posts;
 
 import java.util.List;
 import java.util.Optional;
-
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -57,12 +59,13 @@ public class userController {
   }
 
   @PostMapping(path = "/signup/verify")
-  public ResponseEntity<String> verifyAndAuthenticate(@RequestBody VerifyDto verify) {
+  public ResponseEntity<Map<String, String>> verifyAndAuthenticate(@RequestBody VerifyDto verify) {
     try {
-      return ResponseEntity.ok(authService.checkVerification(verify.getEmail(), verify.getVerificationCode()));
+      String token = authService.checkVerification(verify.getEmail(), verify.getVerificationCode());
+      return ResponseEntity.ok(Map.of("token", token));
     } catch (RuntimeException e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Verification failed: " + e.getMessage());
+          .body(Map.of("error", "Verification failed: " + e.getMessage()));
     }
   }
 
@@ -78,12 +81,27 @@ public class userController {
   }
 
   @GetMapping(path = "/signup/all")
-  public List<PostResponseDto> allposts() {
-    List<PostResponseDto> allposts = postService.allPosts();
+  public ResponseEntity<?> allposts(HttpServletRequest request) {
+    try {
+      String authHeader = request.getHeader("Authorization");
 
-    System.out.println("done sending the posts.");
-    System.out.println(allposts);
-    return allposts;
+      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("Missing or invalid Authorization header");
+      }
+
+      String token = authHeader.substring(7); // Remove "Bearer "
+
+      // Call your authService to validate the token
+      authService.verifyjwt(token); // Assume this throws if invalid
+
+      List<PostResponseDto> allPosts = postService.allPosts();
+      return ResponseEntity.ok(allPosts);
+
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("Invalid or expired token: " + e.getMessage());
+    }
   }
 
   @GetMapping(path = "/signup/allposts/{name}")
@@ -98,7 +116,18 @@ public class userController {
   }
 
   @PostMapping(path = "/signup/interact")
-  public String interact(@RequestParam long id, @RequestParam String interact) {
+  public ResponseEntity<?> interact(@RequestParam long id, @RequestParam String interact, HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("Missing or invalid Authorization header");
+    }
+
+    String token = authHeader.substring(7); // Remove "Bearer "
+
+    // Call your authService to validate the token
+    authService.verifyjwt(token);
     Posts post = postService.getpost(id);
     Posts p = post;
     if ("up".equals(interact)) {
@@ -110,6 +139,7 @@ public class userController {
     }
     postService.save(post);
 
-    return "posts not found";
+    return ResponseEntity.ok("posts not found");
   }
+
 }
