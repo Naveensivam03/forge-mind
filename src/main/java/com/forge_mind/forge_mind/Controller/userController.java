@@ -5,22 +5,17 @@ import com.forge_mind.forge_mind.Dto.PostResponseDto;
 import com.forge_mind.forge_mind.Dto.Signup;
 import com.forge_mind.forge_mind.Dto.VerifyDto;
 import com.forge_mind.forge_mind.Repository.CategRepository;
-import com.forge_mind.forge_mind.Repository.PostRepository;
 import com.forge_mind.forge_mind.Service.AuthService;
 import com.forge_mind.forge_mind.Service.PostService;
 import com.forge_mind.forge_mind.Service.UserService;
 import com.forge_mind.forge_mind.Service.JwtService;
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.forge_mind.forge_mind.database.Category;
 import com.forge_mind.forge_mind.database.Posts;
 
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 
@@ -75,26 +70,26 @@ public class userController {
   }
 
   @GetMapping(path = "signup/verifyToken")
-  public ResponseEntity<?> verifytoken(@RequestHeader("Authorization") String authheader) {
-    ResponseEntity<?> result = authService.verifyjwt(authheader);
+  public String verifytoken(@RequestHeader("Authorization") String authheader) {
+    String result = authService.verifyjwt(authheader);
     return result;
   }
 
   @GetMapping(path = "/signup/all")
-  public ResponseEntity<?> allposts(HttpServletRequest request) {
+  public ResponseEntity<?> allposts(Principal principal) {
     try {
-      String authHeader = request.getHeader("Authorization");
-
-      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body("Missing or invalid Authorization header");
-      }
-
-      String token = authHeader.substring(7); // Remove "Bearer "
-
-      // Call your authService to validate the token
-      authService.verifyjwt(token); // Assume this throws if invalid
-
+//      String authHeader = request.getHeader("Authorization");
+//
+//      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//            .body("Missing or invalid Authorization header");
+//      }
+//
+//      String token = authHeader.substring(7); // Remove "Bearer "
+//
+//      // Call your authService to validate the token
+//      authService.verifyjwt(token); // Assume this throws if invalid
+      String email = principal.getName();
       List<PostResponseDto> allPosts = postService.allPosts();
       return ResponseEntity.ok(allPosts);
 
@@ -116,18 +111,19 @@ public class userController {
   }
 
   @PostMapping(path = "/signup/interact")
-  public ResponseEntity<?> interact(@RequestParam long id, @RequestParam String interact, HttpServletRequest request) {
-    String authHeader = request.getHeader("Authorization");
-
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body("Missing or invalid Authorization header");
-    }
-
-    String token = authHeader.substring(7); // Remove "Bearer "
-
-    // Call your authService to validate the token
-    authService.verifyjwt(token);
+  public ResponseEntity<?> interact(@RequestParam long id, @RequestParam String interact, Principal principal) {
+//    String authHeader = request.getHeader("Authorization");
+//
+//    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//          .body("Missing or invalid Authorization header");
+//    }
+//
+//    String token = authHeader.substring(7); // Remove "Bearer "
+//
+//    // Call your authService to validate the token
+//    authService.verifyjwt(token);
+    String email = principal.getName();
     Posts post = postService.getpost(id);
     Posts p = post;
     if ("up".equals(interact)) {

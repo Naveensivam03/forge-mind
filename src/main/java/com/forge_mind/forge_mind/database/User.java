@@ -67,6 +67,16 @@ public class User implements UserDetails {
     }
 
     @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
     }
@@ -88,6 +98,23 @@ public class User implements UserDetails {
 
 
     public boolean isAccount_enabled() {
-        return false;
+        return isAccount_enabled;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setAccount_enabled(boolean isAccount_enabled) {
+        this.isAccount_enabled = isAccount_enabled;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public String getEmail() {
+        return this.email;
     }
 }
+

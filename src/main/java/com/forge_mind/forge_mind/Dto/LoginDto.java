@@ -21,7 +21,7 @@ public class LoginDto {
     this.email = email;
   }
 
-  public void getPassword(String password) {
+  public void setPassword(String password) {
     this.password = password;
   }
 }

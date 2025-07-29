@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -114,11 +115,11 @@ public class AuthService {
     }
   }
 
-  public ResponseEntity<?> verifyjwt(String authheader) {
+  public String verifyjwt(String authheader) {
     try {
       // Check if the authorization header starts with "Bearer "
       if (authheader == null || !authheader.startsWith("Bearer ")) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authorization header format!");
+        return ("Invalid authorization header format!");
       }
 
       // Extract token by removing "Bearer " prefix (including the space)
@@ -129,11 +130,11 @@ public class AuthService {
 
       // extract the username from the token
       String Username = claims.getSubject();
-      return ResponseEntity.ok(Username + " is valid");
+      return Username;
     } catch (ExpiredJwtException e) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired!");
+      return ("Token expired!");
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token!");
+      return ("Invalid token!");
     }
 
   }
@@ -149,7 +150,9 @@ public class AuthService {
     }
 
     Optional<User> userOptional = userRepository.findByEmail(email.trim());
+    System.out.println("Searching for user with email: " + email.trim());
     if (userOptional.isPresent()) {
+      System.out.println("User found: " + userOptional.get().getUsername());
       User user = userOptional.get();
 
       // Check if account is verified
@@ -163,8 +166,12 @@ public class AuthService {
         // Generate JWT token for successful login
         String jwtToken = jwtService.generateTokens(user);
 
-        return ResponseEntity.ok(
-            "Login successful!");
+        return ResponseEntity.ok(Map.of(
+            "message", "Login successful!",
+            "token", jwtToken,
+            "username", user.getUsername(),
+            "email", user.getEmail()
+        ));
       } else {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body("Invalid password!");
