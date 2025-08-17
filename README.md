@@ -1,6 +1,6 @@
 # ForgeMind
 
-A Spring Boot-based social platform that allows users to create, share, and vote on content across different categories. Similar to a combination of Reddit and YouTube's voting system, ForgeMind provides a secure, scalable backend for content management and user interaction.
+A Spring Boot-based social platform that allows users to find, know, and vote on problems of people across different categories. Similar to a combination of Reddit and YouTube's voting system, ForgeMind provides a secure, scalable backend for content management and user interaction.
 
 ## 🚀 Features
 
