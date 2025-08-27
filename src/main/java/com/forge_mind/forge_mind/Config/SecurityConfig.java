@@ -48,7 +48,8 @@ public class SecurityConfig {
                 "/signup/all",
                 "/signup/interact",
                 "/signup/allposts/**",
-                "/signup/allcateg")
+                "/signup/allcateg",
+                "/signup/user-votes")
             .authenticated()
 
             // Secure everything else by default

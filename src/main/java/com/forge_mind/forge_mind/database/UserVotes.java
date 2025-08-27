@@ -26,7 +26,7 @@ public class UserVotes {
     private VoteType voteType;
 
 
-    private enum VoteType{
+    public enum VoteType{
         UPVOTE , DOWNVOTE
     }
 

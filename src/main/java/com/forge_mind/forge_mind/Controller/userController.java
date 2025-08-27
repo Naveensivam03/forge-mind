@@ -9,10 +9,13 @@ import com.forge_mind.forge_mind.Service.AuthService;
 import com.forge_mind.forge_mind.Service.PostService;
 import com.forge_mind.forge_mind.Service.UserService;
 import com.forge_mind.forge_mind.Service.JwtService;
+import com.forge_mind.forge_mind.Service.VoteService;
+import com.forge_mind.forge_mind.Repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.forge_mind.forge_mind.database.Category;
 import com.forge_mind.forge_mind.database.Posts;
+import com.forge_mind.forge_mind.database.User;
 
 import java.security.Principal;
 import java.util.List;
@@ -27,14 +30,18 @@ public class userController {
   private JwtService jwtService;
   private PostService postService;
   private CategRepository categRepository;
+  private VoteService voteService;
+  private UserRepository userRepository;
 
   public userController(UserService userService, AuthService authService, JwtService jwtService,
-      PostService postService, CategRepository categRepository) {
+      PostService postService, CategRepository categRepository, VoteService voteService, UserRepository userRepository) {
     this.userService = userService;
     this.authService = authService;
     this.jwtService = jwtService;
     this.postService = postService;
     this.categRepository = categRepository;
+    this.voteService = voteService;
+    this.userRepository = userRepository;
   }
 
   @GetMapping(path = "/allusers")
@@ -66,7 +73,10 @@ public class userController {
 
   @PostMapping(path = "/login")
   public ResponseEntity<?> login(@RequestBody LoginDto loginRequest) {
-    return authService.login(loginRequest.getEmail(), loginRequest.getPassword());
+    System.out.println("Login endpoint hit with email: " + loginRequest.getEmail());
+    ResponseEntity<?> result = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
+    System.out.println("Login result status: " + result.getStatusCode());
+    return result;
   }
 
   @GetMapping(path = "signup/verifyToken")
@@ -112,30 +122,55 @@ public class userController {
 
   @PostMapping(path = "/signup/interact")
   public ResponseEntity<?> interact(@RequestParam long id, @RequestParam String interact, Principal principal) {
-//    String authHeader = request.getHeader("Authorization");
-//
-//    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//          .body("Missing or invalid Authorization header");
-//    }
-//
-//    String token = authHeader.substring(7); // Remove "Bearer "
-//
-//    // Call your authService to validate the token
-//    authService.verifyjwt(token);
-    String email = principal.getName();
-    Posts post = postService.getpost(id);
-    Posts p = post;
-    if ("up".equals(interact)) {
-      int upvotes = p.getUpvotes();
-      p.setUpvotes(upvotes + 1);
-    } else if ("down".equals(interact)) {
-      int down = p.getDownvotes();
-      p.setDownvotes(down + 1);
+    try {
+      String username = principal.getName();
+      User user = userRepository.findByUsername(username)
+          .orElseThrow(() -> new RuntimeException("User not found"));
+      
+      Posts post = postService.getpost(id);
+      if (post == null) {
+        return ResponseEntity.badRequest().body("Post not found");
+      }
+      
+      String result = voteService.handleUserVote(user, post, interact);
+      postService.save(post); // Save the updated vote counts
+      
+      return ResponseEntity.ok(Map.of(
+          "message", "Vote processed successfully",
+          "result", result,
+          "upvotes", post.getUpvotes(),
+          "downvotes", post.getDownvotes()
+      ));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error processing vote: " + e.getMessage());
     }
-    postService.save(post);
-
-    return ResponseEntity.ok("posts not found");
+  }
+  
+  @GetMapping(path = "/signup/user-votes")
+  public ResponseEntity<?> getUserVotes(Principal principal) {
+    try {
+      if (principal == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("User not authenticated");
+      }
+      
+      String username = principal.getName();
+      System.out.println("Getting votes for user: " + username);
+      
+      User user = userRepository.findByUsername(username)
+          .orElseThrow(() -> new RuntimeException("User not found: " + username));
+      
+      Map<Long, String> userVotes = voteService.getUserVoteMap(user.getId());
+      System.out.println("Found " + userVotes.size() + " votes for user " + username);
+      
+      return ResponseEntity.ok(userVotes);
+    } catch (Exception e) {
+      System.err.println("Error fetching user votes: " + e.getMessage());
+      e.printStackTrace();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(Map.of("error", "Error fetching user votes: " + e.getMessage()));
+    }
   }
 
 }
