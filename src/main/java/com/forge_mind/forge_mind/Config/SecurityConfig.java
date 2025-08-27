@@ -29,7 +29,7 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     http
-
+        .cors(cors -> {}) // Enable CORS using WebConfig
         .cors(Customizer.withDefaults())
 
         .csrf(c -> c.disable())
