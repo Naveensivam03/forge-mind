@@ -21,6 +21,6 @@ public class EmailService {
         helper.setSubject(subject);
         helper.setText(text , true);
         javaMailSender.send(mimeMessage);
-        System.out.println("fininshed");
+        // System.out.println("fininshed");
     }
 }

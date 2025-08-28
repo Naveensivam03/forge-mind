@@ -105,54 +105,7 @@ public class AuthService {
         user.setVerificationCode(null);
         userRepository.save(user);
         String jwtToken = jwtService.generateTokens(user);
-        System.out.println("User " + user.getUsername() + " verified successfully! JWT Token: " + jwtToken);
-        return jwtToken;
-      } else {
-        return "Invalid verification code!";
-      }
-    } else {
-      return "Email doesn't exist!";
-    }
-  }
-
-  public String verifyjwt(String authheader) {
-    try {
-      // Check if the authorization header starts with "Bearer "
-      if (authheader == null || !authheader.startsWith("Bearer ")) {
-        return ("Invalid authorization header format!");
-      }
-
-      // Extract token by removing "Bearer " prefix (including the space)
-      String token = authheader.substring(7);
-
-      // verify its validity
-      Claims claims = jwtService.verifyToken(token);
-
-      // extract the username from the token
-      String Username = claims.getSubject();
-      return Username;
-    } catch (ExpiredJwtException e) {
-      return ("Token expired!");
-    } catch (Exception e) {
-      return ("Invalid token!");
-    }
-
-  }
-
-  // login
-  public ResponseEntity<?> login(String email, String password) {
-    // Validate input parameters
-    if (email == null || email.trim().isEmpty()) {
-      return ResponseEntity.badRequest().body("Email cannot be null or empty!");
-    }
-    if (password == null || password.trim().isEmpty()) {
-      return ResponseEntity.badRequest().body("Password cannot be null or empty!");
-    }
-
-    Optional<User> userOptional = userRepository.findByEmail(email.trim());
-    System.out.println("Searching for user with email: " + email.trim());
-    if (userOptional.isPresent()) {
-      System.out.println("User found: " + userOptional.get().getUsername());
+        // System.out.println("User found: " + userOptional.get().getUsername());
       User user = userOptional.get();
 
       // Check if account is verified

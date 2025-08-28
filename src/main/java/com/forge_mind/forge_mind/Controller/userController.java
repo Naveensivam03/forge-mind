@@ -53,7 +53,7 @@ public class userController {
   public String signup(@RequestBody Signup request) {
     try {
       authService.signup(request.getUsername(), request.getEmail(), request.getPassword());
-      System.out.println("Signup successful! Please check your email for verification code.");
+      // System.out.println("Signup successful! Please check your email for verification code.");
       return "Signup successful! Please check your email for verification code.";
     } catch (RuntimeException e) {
       return "Signup failed: " + e.getMessage();
@@ -73,9 +73,9 @@ public class userController {
 
   @PostMapping(path = "/login")
   public ResponseEntity<?> login(@RequestBody LoginDto loginRequest) {
-    System.out.println("Login endpoint hit with email: " + loginRequest.getEmail());
+    // System.out.println("Login endpoint hit with email: " + loginRequest.getEmail());
     ResponseEntity<?> result = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
-    System.out.println("Login result status: " + result.getStatusCode());
+    // System.out.println("Login result status: " + result.getStatusCode());
     return result;
   }
 
@@ -116,7 +116,7 @@ public class userController {
 
   @GetMapping(path = "/signup/allcateg")
   public List<Category> allcategory() {
-    System.out.println("hello");
+    // System.out.println("hello");
     return (categRepository.findAll());
   }
 
@@ -156,13 +156,13 @@ public class userController {
       }
       
       String username = principal.getName();
-      System.out.println("Getting votes for user: " + username);
+      // System.out.println("Getting votes for user: " + username);
       
       User user = userRepository.findByUsername(username)
           .orElseThrow(() -> new RuntimeException("User not found: " + username));
       
       Map<Long, String> userVotes = voteService.getUserVoteMap(user.getId());
-      System.out.println("Found " + userVotes.size() + " votes for user " + username);
+      // System.out.println("Found " + userVotes.size() + " votes for user " + username);
       
       return ResponseEntity.ok(userVotes);
     } catch (Exception e) {
