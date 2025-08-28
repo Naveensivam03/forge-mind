@@ -1,9 +1,14 @@
 FROM openjdk:24-jdk-slim
 
-WORKDIR app
+WORKDIR /app
 
-COPY target/forge-mind-0.0.1-SNAPSHOT.jar  /app/forge-mind-0.0.1-SNAPSHOT.jar
+# Copy built JAR
+COPY target/forge-mind-0.0.1-SNAPSHOT.jar ./app.jar
 
-EXPOSE 8080
+# Expose dynamic port for Render
+ENV PORT 8080
+EXPOSE ${PORT}
 
-ENTRYPOINT ["java","-jar","forge-mind-0.0.1-SNAPSHOT.jar"]
+# Run the app
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
