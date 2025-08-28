@@ -129,7 +129,7 @@ public class AuthService {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body("Invalid password!");
       }
-    } else {
+     else {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body("User with this email does not exist!");
     }
