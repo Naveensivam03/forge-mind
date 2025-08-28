@@ -41,7 +41,7 @@ public class SecurityConfig {
                                                                                                 // sessions and
                                                                                                 // use those.
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/signup", "/signup/verify", "/login").permitAll()
+            .requestMatchers("/signup", "/signup/verify", "/login","/check-username","/check-email").permitAll()
 
             // Secure these endpoints
             .requestMatchers(

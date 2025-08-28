@@ -172,5 +172,15 @@ public class userController {
           .body(Map.of("error", "Error fetching user votes: " + e.getMessage()));
     }
   }
+@GetMapping("/check-username")
+public ResponseEntity<Map<String, Boolean>> checkUsername(@RequestParam String username) {
+    boolean isAvailable = !userRepository.existsByUsername(username);
+    return ResponseEntity.ok(Map.of("available", isAvailable));
+}
+@GetMapping("/check-email")
+public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+    boolean isAvailable = !userRepository.existsByEmail(email);
+    return ResponseEntity.ok(Map.of("available", isAvailable));
+}
 
 }
