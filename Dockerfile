@@ -29,6 +29,8 @@ COPY --from=build /app/target/forge-mind-0.0.1-SNAPSHOT.jar /app/forge-mind-0.0.
 
 # Expose the port your app runs on
 EXPOSE 8080
+ENV PORT=8080
+# ENTRYPOINT ["java","-jar","forge-mind-0.0.1-SNAPSHOT.jar"]
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "forge-mind-0.0.1-SNAPSHOT.jar"]
