@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**") // allow all routes
-        .allowedOrigins("https://mind-splitter.vercel.app/login") // your React/Electron/Vite app
+        .allowedOrigins("https://mind-splitter.vercel.app") // your React/Electron/Vite app
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
         .allowedHeaders("*")
         .allowCredentials(true); // only enable if using cookies/session
