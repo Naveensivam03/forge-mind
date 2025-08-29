@@ -32,17 +32,20 @@ public class AuthService {
 
   // authentication service for the signup:
   public void signup(String username, String email, String password) {
+    // check whether the email already exists or not
     Optional<User> user = userRepository.findByEmail(email);
 
     if (user.isPresent()) {
       throw new RuntimeException("User with email " + email + " already exists!");
     } else {
+      // Hash the password before saving
       String hashedPassword = passwordEncoder.encode(password);
       User newUser = new User(username, email, hashedPassword);
       newUser.setVerificationCode(verificationCode());
-      newUser.setAccount_enabled(false);
+      newUser.setAccount_enabled(false); // Initially disabled until verified
       User savedUser = userRepository.save(newUser);
 
+      // Send verification email with the saved user data
       sendVerificationEmail(savedUser);
     }
   }
@@ -77,6 +80,7 @@ public class AuthService {
   }
 
   public String checkVerification(String email, String verificationCode) {
+    // Validate input parameters
     if (email == null || email.trim().isEmpty()) {
       throw new RuntimeException("Email cannot be null or empty!");
     }
@@ -88,22 +92,116 @@ public class AuthService {
     if (userOptional.isPresent()) {
       User user = userOptional.get();
 
+      // Check if user is already verified
       if (user.isAccount_enabled()) {
         return "User is already verified!";
       }
 
+      // Check if verification code matches
       if (user.getVerificationCode() != null && user.getVerificationCode().equals(verificationCode.trim())) {
+        // Enable the account
         user.setAccount_enabled(true);
+        // Clear the verification code for security
         user.setVerificationCode(null);
         userRepository.save(user);
-        return "Account verified successfully!";
+        String jwtToken = jwtService.generateTokens(user);
+        // System.out.println("User " + user.getUsername() + " verified successfully! JWT Token: " + jwtToken);
+        return jwtToken;
       } else {
         return "Invalid verification code!";
       }
-
     } else {
-      return "User with this email does not exist!";
+      return "Email doesn't exist!";
     }
   }
-}
 
+  public String verifyjwt(String authheader) {
+    try {
+      // Check if the authorization header starts with "Bearer "
+      if (authheader == null || !authheader.startsWith("Bearer ")) {
+        return ("Invalid authorization header format!");
+      }
+
+      // Extract token by removing "Bearer " prefix (including the space)
+      String token = authheader.substring(7);
+
+      // verify its validity
+      Claims claims = jwtService.verifyToken(token);
+
+      // extract the username from the token
+      String Username = claims.getSubject();
+      return Username;
+    } catch (ExpiredJwtException e) {
+      return ("Token expired!");
+    } catch (Exception e) {
+      return ("Invalid token!");
+    }
+
+  }
+
+  // login
+  public ResponseEntity<?> login(String email, String password) {
+    // Validate input parameters
+    if (email == null || email.trim().isEmpty()) {
+      return ResponseEntity.badRequest().body("Email cannot be null or empty!");
+    }
+    if (password == null || password.trim().isEmpty()) {
+      return ResponseEntity.badRequest().body("Password cannot be null or empty!");
+    }
+
+    Optional<User> userOptional = userRepository.findByEmail(email.trim());
+    // System.out.println("Searching for user with email: " + email.trim());
+    if (userOptional.isPresent()) {
+      // System.out.println("User found: " + userOptional.get().getUsername());
+      User user = userOptional.get();
+
+      // Check if account is verified
+      if (!user.isAccount_enabled()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("Account not verified. Please verify your email first.");
+      }
+
+      // Check if password matches
+      if (passwordEncoder.matches(password, user.getPassword())) {
+        // Generate JWT token for successful login
+        String jwtToken = jwtService.generateTokens(user);
+
+        return ResponseEntity.ok(Map.of(
+            "message", "Login successful!",
+            "token", jwtToken,
+            "username", user.getUsername(),
+            "email", user.getEmail()
+        ));
+      } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("Invalid password!");
+      }
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("User with this email does not exist!");
+    }
+  }
+
+  // // Inner class for login response
+  // public static class LoginResponse {
+  // private String message;
+  // private String token;
+  // private String username;
+  // private String email;
+  //
+  // public LoginResponse(String message, String token, String username, String
+  // email) {
+  // this.message = message;
+  // this.token = token;
+  // this.username = username;
+  // this.email = email;
+  // }
+  //
+  // // Getters
+  // public String getMessage() { return message; }
+  // public String getToken() { return token; }
+  // public String getUsername() { return username; }
+  // public String getEmail() { return email; }
+  // }
+
+}
